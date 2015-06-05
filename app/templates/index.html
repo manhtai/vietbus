@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}Trang chủ - Việt Bus{% endblock %}
+
+{% block map %}
+<div id="map"></div>
+{% endblock %}
+
+{% block page_content %}
+<div class="col-xs-12 col-md-3 col-md-offset-9">
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab">
+            <a data-toggle="collapse" href="#findbus" aria-expanded="true" aria-controls="findbus">
+                Ẩn / hiện thanh tìm kiếm
+            </a>
+        </div>
+
+    <div class="panel-collapse collapse in" id="findbus">
+        <div class="panel-body">
+            <form method="post" class="form" role="form">
+            <div class="input-group">
+                {{ form.hidden_tag() }}
+                <span class="input-group-addon">A</span>
+                {{ form.source(class="form-control") }}
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" onclick="javascript:clearSource();">
+                        Chọn lại
+                    </button>
+                </span>
+            </div>
+            <br/>
+            <div class="input-group">
+                <span class="input-group-addon">B</span>
+                {{ form.destin(class="form-control") }}
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" onclick="javascript:clearDestin();">
+                        Chọn lại
+                    </button>
+                </span>
+            </div>
+            <br/>
+                {{ form.submit(class="btn btn-success", type="submit") }}
+            </form>
+
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script>
+    var map = L.map('map').setView([21.029, 105.852], 13);
+
+
+    L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      id: 'manhtai.mc150cne',
+      opacity: 1,
+    }).addTo(map);
+    
+    L.tileLayer('http://www.openptmap.org/tiles/{z}/{x}/{y}.png', {
+        opacity: 0.5,
+    }).addTo(map).bringToFront();
+
+
+    var source = document.getElementById('source');
+    var destin = document.getElementById('destin');
+    var srcMark = L.marker()
+    var desMark = L.marker()
+
+    function onMapClick(e) {
+      if (!source.value) {
+        source.value = e.latlng.toString().slice(7,-1);
+        srcMark.setLatLng(e.latlng)
+          .addTo(map)
+          .bindPopup("A: Điểm bắt đầu").openPopup();
+      } else {
+      if (!destin.value) {
+        destin.value = e.latlng.toString().slice(7,-1);
+        desMark.setLatLng(e.latlng)
+          .addTo(map)
+          .bindPopup("B: Điểm kết thúc").openPopup();
+        }
+      }
+    }
+
+    map.on('click', onMapClick);
+
+
+    function clearSource() {
+        source.value = '';
+    }
+
+    function clearDestin() {
+        destin.value = '';
+    }
+    {% if result %}
+    L.marker({{ result.source }}).addTo(map).bindPopup("A: Bắt đầu");
+    L.marker({{ result.destin }}).addTo(map).bindPopup("B: Kết thúc");
+    var bicycleRental = {{ result.path | safe }};
+    {% endif %}
+
+    function onEachFeature(feature, layer) {
+      var popupContent = "Xe ";
+      if (feature.properties && feature.properties.popupContent) {
+        popupContent += feature.properties.popupContent;
+      }
+
+      layer.bindPopup(popupContent);
+    }
+
+
+    L.geoJson([bicycleRental], {
+
+      style: function (feature) {
+        return feature.properties && feature.properties.style;
+      },
+
+      onEachFeature: onEachFeature,
+
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, {
+          radius: 5,
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        });
+      }
+    }).addTo(map);
+
+  </script>
+{% endblock %}
