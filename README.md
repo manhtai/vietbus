@@ -83,7 +83,7 @@ This app is built on top of Python 3.4. May or may not work with Python 2.x
 
 If all things works, the app may look like this:
 
-![vietbus](app/static/vietbus.jgp)
+![vietbus](app/static/vietbus.jpg)
 
 
 
