@@ -81,10 +81,7 @@ This app is built on top of Python 3.4. May or may not work with Python 2.x
 
 ## How does it look?
 
-If all things works, the app may look like this:
-
-![vietbus](app/static/vietbus.jpg)
-
+Demo version: [vietbus.herokuapp.com](http://vietbus.herokuapp.com).
 
 
 

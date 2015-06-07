@@ -156,7 +156,8 @@ def to_lat_lon(lat_lon):
 def get_near(lat_lon):
     "Get ID of bus stop near lon_lat: get_near([105.85258, 20.9959])"
     lon_lat = to_lon_lat(lat_lon)
-    point = {"coordinates": lon_lat}
+    point = {"type": "Point",
+             "coordinates": lon_lat}
     # We temporarily use the nearest bus stop for solving problem, but we can
     # solve for some nearest stops for finding the optimal solution
     for i in mongo.db.stops.find({"loc": {"$near": {"$geometry": point}}}):
